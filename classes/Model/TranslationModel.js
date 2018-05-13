@@ -1,8 +1,7 @@
 module.exports = class TranslationModel {
 
-  constructor(word, translate) {
-    this.word = word;
-    this.translate = translate;
+  constructor(obj) {
+    Object.assign(this, obj);
   }
 
   setTranslationId(translationId) {

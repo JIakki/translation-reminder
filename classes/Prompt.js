@@ -6,9 +6,9 @@ module.exports = class {
   }
 
   input() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       prompt.get('word', (err, result) => {
-        if(err) return reject(err);
+        if(err) return process.exit(0);
 
         resolve(result.word);
       });

@@ -15,4 +15,8 @@ module.exports = new class Logger {
     console.log(boxen(starryText, { padding: 1 }));
   }
 
+  error(text) {
+    console.error(text)
+  }
+
 }

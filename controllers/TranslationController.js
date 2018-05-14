@@ -6,9 +6,9 @@ module.exports = class TranslationController extends Controller {
   translate(input) {
     const Translater = this.getService("Translater");
     const events = this.getService("events");
-    const translater = new Translater("en", "ru");
+    const translater = new Translater();
 
-    translater.translate(input)
+    return translater.translate(input)
       .then(result => {
         events.newTranslation(input, result)
           .then(() => events.input());

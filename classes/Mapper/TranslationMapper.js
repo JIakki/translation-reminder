@@ -16,11 +16,19 @@ module.exports = class TranslationMapper extends Mapper {
   }
 
   getRandomTranslation() {
-    const records = this.db.value();
-
+    const records = this.db.filter({ learned: false }).value();
+    
     if(!records.length) return false;
     const index = Math.floor(Math.random() * records.length);
 
     return records[index];
+  }
+
+  updateTranslation(translation) {
+    this.db
+      .find({ word: translation.word })
+      .assign(translation)
+      .write()
+
   }
 }

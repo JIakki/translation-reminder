@@ -11,7 +11,7 @@ module.exports = class Translater {
     const to = this.to;
 
     return translate(data, { from, to })
-      .then(res => res.text)
+      .then(res => res.text.toLowerCase())
   }
 
 }

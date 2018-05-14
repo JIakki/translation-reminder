@@ -1,7 +1,22 @@
 module.exports = class TranslationModel {
 
-  constructor(obj) {
-    Object.assign(this, obj);
+  /**
+   * constructor
+   *
+   * @name constructor
+   * @function
+   * @param word string
+   * @param translate string
+   * @param priority int
+   * @param translationId string
+   * @returns {undefined}
+   */
+  constructor({ word, translate, priority, translationId, learned = false }) {
+    this.word = word;
+    this.translate = translate;
+    this.traslationId = translationId;
+    this.priority = priority;
+    this.learned = learned;
   }
 
   setTranslationId(translationId) {
@@ -18,5 +33,13 @@ module.exports = class TranslationModel {
   
   getTranslate() {
     return this.translate;
+  }
+
+  isLearned() {
+    return this.learned;
+  }
+
+  setLearnStatus(status) {
+    this.learned = status;
   }
 }

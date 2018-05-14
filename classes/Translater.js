@@ -2,8 +2,8 @@ const translate = require('google-translate-api');
 
 module.exports = class Translater {
   constructor(from, to) {
-    this.from = from;
-    this.to = to;
+    this.from = from || process.env.FROM_LANG;
+    this.to = to || process.env.TO_LANG;
   }
 
   translate(data) {

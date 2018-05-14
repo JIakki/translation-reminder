@@ -7,10 +7,10 @@ const { TranslationFormatter } = require('../classes/Formatter')
 
 const prompt = new Prompt();
 
-module.exports = {
+module.exports = new class {
   init() {
     this.input();
-  },
+  }
 
   input() {
     const ctrl = new TranslationController();
@@ -19,8 +19,8 @@ module.exports = {
 
     return prompt.input()
       .then(word => ctrl.translate(word))
-      .catch(console.log)
-  },
+      .catch(Logger.error)
+  }
 
   newTranslation(word, translate) {
     const ctrl = new TranslationController();
@@ -31,8 +31,9 @@ module.exports = {
     ctrl.service("shortid", shortid);
     ctrl.service("Logger", Logger);
     
-    return ctrl.createTranslation(word, translate).catch(console.log)
-  },
+    return ctrl.createTranslation(word, translate)
+      .catch(Logger.error)
+  }
 
   checkTranslation() {
     const ctrl = new TranslationController();
@@ -42,6 +43,7 @@ module.exports = {
     ctrl.service("TranslationMapper", TranslationMapper);
     ctrl.service("TranslationModel", TranslationModel);
 
-    return ctrl.checkTranslation().catch(console.log);
+    return ctrl.checkTranslation() 
+      .catch(Logger.error)
   }
 }

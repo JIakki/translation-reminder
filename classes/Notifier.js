@@ -9,8 +9,13 @@ module.exports = class Notifier {
   }
 
   static message(message) {
-    notifier.notify({ message });
-    return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      notifier.notify({ message }, err => {
+        if(err) return reject(err);
+
+        return resolve();
+      });
+    })
   }
 
   static question(message) {
@@ -26,7 +31,7 @@ module.exports = class Notifier {
           return resolve(meta.activationValue);
         }
 
-        return reject();
+        return reject(err);
       });
     });
   }

@@ -41,8 +41,9 @@ module.exports = class TranslationController extends Controller {
 
     const TranslationMapper = this.getService("TranslationMapper");
     const TranslationModel = this.getService("TranslationModel");
+    const translationMapper = new TranslationMapper(db.connect(collection));
 
-    const result = new TranslationMapper(db.connect(collection)).getRandomTranslation();
+    const result = translationMapper.getRandomTranslation();
 
     if(!result) return notifier.message("Phrasebook is empty");
 
@@ -50,7 +51,12 @@ module.exports = class TranslationController extends Controller {
 
     return notifier.question(translation.getOrigin())
       .then(answer => {
-        if(answer === translation.getTranslate().toLowerCase()) return notifier.success();
+        if(answer === translation.getTranslate()) {
+          translation.setLearnStatus(true);
+          translationMapper.updateTranslation(translation);
+ 
+          return notifier.success();
+        };
 
         return Promise.reject();
       })

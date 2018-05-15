@@ -16,7 +16,9 @@ module.exports = class TranslationMapper extends Mapper {
   }
 
   getRandomTranslation() {
-    const records = this.db.filter({ learned: false }).value();
+    const records = this.db
+      .filter({ learned: false })
+      .filter(e => Date.now() > e.learnAfterTime).value();
     
     if(!records.length) return false;
     const index = Math.floor(Math.random() * records.length);
@@ -29,6 +31,14 @@ module.exports = class TranslationMapper extends Mapper {
       .find({ word: translation.word })
       .assign(translation)
       .write()
+  }
+
+  migrate() {
+    for(const e of this.db.value()) {
+      this.db.find({ translationId: e.translationId }).assign({
+        learnAfterTime: Date.now(), rating: 0
+      }).write()
+    }
 
   }
 }

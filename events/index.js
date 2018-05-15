@@ -1,25 +1,21 @@
 const shortid = require('shortid');
 const { TranslationController } = require('../controllers');
-const { Prompt, Translater, Logger, Database, Notifier } = require('../classes'); 
+const { Translater, Logger, Database, Notifier } = require('../classes'); 
 const { TranslationModel } = require('../classes/Model')
 const { TranslationMapper } = require('../classes/Mapper')
 const { TranslationFormatter } = require('../classes/Formatter')
-
-const prompt = new Prompt();
 
 module.exports = new class {
   init() {
     this.input();
   }
 
-  input() {
+  input(word) {
     const ctrl = new TranslationController();
     ctrl.service("Translater", Translater);
     ctrl.service("events", this);
 
-    return prompt.input()
-      .then(word => ctrl.translate(word))
-      .catch(Logger.error)
+    return ctrl.translate(word).catch(Logger.error)
   }
 
   newTranslation(word, translate) {

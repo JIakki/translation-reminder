@@ -8,7 +8,9 @@ module.exports = class TranslationFormatter {
       translationId: this.translation.getTranslationId(),
       word: this.translation.getOrigin(),
       translate: this.translation.getTranslate(),
-      learned: this.translation.isLearned()
+      learned: this.translation.isLearned(),
+      learnAfterTime: this.translation.getLearnTime(),
+      rating: this.translation.getRating()
     }
   }
 

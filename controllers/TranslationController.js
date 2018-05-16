@@ -10,8 +10,7 @@ module.exports = class TranslationController extends Controller {
 
     return translater.translate(input)
       .then(result => {
-        events.newTranslation(input, result)
-          .then(() => events.input());
+        return events.newTranslation(input, result)
       });
   }
 
@@ -26,6 +25,7 @@ module.exports = class TranslationController extends Controller {
     const translation = new TranslationModel({ word, translate });
 
     translation.setTranslationId(shortid.generate());
+    translation.setLearnTime(Date.now());
 
     const formatted = (new TranslationFormatter(translation)).format();
     const result = new TranslationMapper(db.connect(collection)).createTranslation(formatted);
@@ -51,17 +51,15 @@ module.exports = class TranslationController extends Controller {
 
     return notifier.question(translation.getOrigin())
       .then(answer => {
-        if(answer === translation.getTranslate()) {
-          translation.setLearnStatus(true);
-          translationMapper.updateTranslation(translation);
- 
-          return notifier.success();
-        };
+        if(answer !== translation.getTranslate()) return Promise.reject();
 
-        return Promise.reject();
+        translation.setLearnStatus(true);
+        translation.incRating(1);
+        translation.updateNextLearnTimeByRating();
+
+        translationMapper.updateTranslation(translation);
+        return notifier.success();
       })
-      .catch(() => {
-        return notifier.message(`Wrong. Answer is ${ translation.getTranslate() }`)
-      });
+      .catch(() => notifier.message(`Wrong. Answer is ${ translation.getTranslate() }`));
   }
 }

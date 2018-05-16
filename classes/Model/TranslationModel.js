@@ -1,3 +1,12 @@
+const day = 86400000;
+const ratingMap = {
+  0: 0,
+  1: day,
+  2: day * 7,
+  3: day * 31,
+  4: day* 90
+}
+
 module.exports = class TranslationModel {
 
   /**
@@ -11,16 +20,13 @@ module.exports = class TranslationModel {
    * @param translationId string
    * @returns {undefined}
    */
-  constructor({ word, translate, priority, translationId, learned = false }) {
+  constructor({ word, translate, translationId, learnAfterTime, learned = false, rating = 0 }) {
     this.word = word;
     this.translate = translate;
     this.traslationId = translationId;
-    this.priority = priority;
     this.learned = learned;
-  }
-
-  setTranslationId(translationId) {
-    this.translationId = translationId;
+    this.learnAfterTime  = learnAfterTime;
+    this.rating = rating;
   }
 
   getTranslationId() {
@@ -39,7 +45,37 @@ module.exports = class TranslationModel {
     return this.learned;
   }
 
+  getLearnTime() {
+    return this.learnAfterTime;
+  }
+
+  getRating() {
+    return this.rating;
+  }
+
+  setTranslationId(translationId) {
+    this.translationId = translationId;
+  }
+
   setLearnStatus(status) {
     this.learned = status;
+  }
+
+  setLearnTime(time) {
+    this.learnAfterTime = time;
+  }
+
+  incRating(value) {
+    this.rating += value;
+  }
+
+  updateNextLearnTimeByRating() {
+    const value = ratingMap[this.rating];
+
+    if(!value) {
+      return this.setLearnStatus(true);
+    }
+
+    this.setLearnTime(Date.now() + ratingMap[this.rating]);
   }
 }

@@ -18,21 +18,32 @@ module.exports = class TranslationController extends Controller {
     const db = this.getService("Database");
     const shortid = this.getService("shortid");
     const Logger = this.getService("Logger");
+    const Prompt = this.getService("Prompt");
 
     const TranslationMapper = this.getService("TranslationMapper");
     const TranslationFormatter = this.getService("TranslationFormatter");
     const TranslationModel = this.getService("TranslationModel");
-    const translation = new TranslationModel({ word, translate });
 
+    const translation = new TranslationModel({ word, translate });
+    const translationMapper = new TranslationMapper(db.connect(collection)) 
     translation.setTranslationId(shortid.generate());
     translation.setLearnTime(Date.now());
 
     const formatted = (new TranslationFormatter(translation)).format();
-    const result = new TranslationMapper(db.connect(collection)).createTranslation(formatted);
 
-    result.updated ? Logger.boxed(translate) : Logger.starry(translate);
+    if(translationMapper.getTranslation(formatted)) {
+      Logger.starry(translate);
+      return Promise.resolve();
+    }
 
-    return Promise.resolve();
+    Logger.boxed(translate);
+    
+    return Prompt.confirm()
+      .then(agree => {
+        if(!agree) return Promise.resolve();
+
+        return translationMapper.createTranslation(formatted);
+      });
   }
 
   checkTranslation() {

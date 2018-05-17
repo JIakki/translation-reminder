@@ -1,6 +1,6 @@
 const shortid = require('shortid');
 const { TranslationController } = require('../controllers');
-const { Translater, Logger, Database, Notifier } = require('../classes'); 
+const { Prompt, Translater, Logger, Database, Notifier } = require('../classes'); 
 const { TranslationModel } = require('../classes/Model')
 const { TranslationMapper } = require('../classes/Mapper')
 const { TranslationFormatter } = require('../classes/Formatter')
@@ -26,7 +26,8 @@ module.exports = new class {
     ctrl.service("TranslationModel", TranslationModel);
     ctrl.service("shortid", shortid);
     ctrl.service("Logger", Logger);
-    
+    ctrl.service("Prompt", Prompt);
+
     return ctrl.createTranslation(word, translate)
       .catch(Logger.error)
   }

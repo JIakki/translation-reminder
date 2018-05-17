@@ -3,16 +3,13 @@ const Mapper = require('./Base');
 module.exports = class TranslationMapper extends Mapper {
   
   createTranslation(translation) {
-    if(this.db.find({ word: translation.word }).value()) {
-      return { updated: false };
-    }
-
-    this.db
+    return this.db
       .push(translation)
       .write()
+  }
 
-    return { updated: true }
-
+  getTranslation(translation) {
+    return this.db.find({ word: translation.word }).value();
   }
 
   getRandomTranslation() {

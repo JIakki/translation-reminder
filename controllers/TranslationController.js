@@ -62,14 +62,14 @@ module.exports = class TranslationController extends Controller {
 
     return notifier.question(translation.getOrigin())
       .then(answer => {
-        if(answer !== translation.getTranslate()) return Promise.reject();
+        const isAnswerCorrect = translation.getTranslate() === answer;
 
-        translation.setLearnStatus(true);
-        translation.incRating(1);
+        isAnswerCorrect ? translation.incRating(1) : translation.incRating(-1);
+
         translation.updateNextLearnTimeByRating();
-
         translationMapper.updateTranslation(translation);
-        return notifier.success();
+
+        return isAnswerCorrect ? notifier.success() : Promise.reject();
       })
       .catch(() => notifier.message(`Wrong. Answer is ${ translation.getTranslate() }`));
   }

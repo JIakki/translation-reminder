@@ -24,17 +24,24 @@ module.exports = class TranslationController extends Controller {
     const TranslationFormatter = this.getService("TranslationFormatter");
     const TranslationModel = this.getService("TranslationModel");
 
-    const translation = new TranslationModel({ word, translate });
-    const translationMapper = new TranslationMapper(db.connect(collection)) 
-    translation.setTranslationId(shortid.generate());
-    translation.setLearnTime(Date.now());
+    const translationMapper = new TranslationMapper(db.connect(collection));
+    const existingTranslation = translationMapper.getTranslation(word)
 
-    const formatted = (new TranslationFormatter(translation)).format();
-
-    if(translationMapper.getTranslation(formatted)) {
-      Logger.starry(translate);
+    if(existingTranslation) {
+      Logger.starry(new TranslationModel(existingTranslation).getTranslate());
       return Promise.resolve();
     }
+    
+    const translation = new TranslationModel({ word, translate });
+    const inverseTranslation = new TranslationModel({ word: translate, translate: word });
+
+    translation.setTranslationId(shortid.generate());
+    translation.setLearnTime(Date.now());
+    inverseTranslation.setTranslationId(shortid.generate());
+    inverseTranslation.setLearnTime(Date.now());
+    
+    const formattedTranslation = (new TranslationFormatter(translation)).format();
+    const formattedInverseTranslation = (new TranslationFormatter(inverseTranslation)).format();
 
     Logger.boxed(translate);
     
@@ -42,7 +49,8 @@ module.exports = class TranslationController extends Controller {
       .then(agree => {
         if(!agree) return Promise.resolve();
 
-        return translationMapper.createTranslation(formatted);
+        translationMapper.createTranslation(formattedTranslation);
+        translationMapper.createTranslation(formattedInverseTranslation);
       });
   }
 
@@ -62,14 +70,14 @@ module.exports = class TranslationController extends Controller {
 
     return notifier.question(translation.getOrigin())
       .then(answer => {
-        if(answer !== translation.getTranslate()) return Promise.reject();
+        const isAnswerCorrect = translation.getTranslate() === answer;
 
-        translation.setLearnStatus(true);
-        translation.incRating(1);
+        isAnswerCorrect ? translation.incRating(1) : translation.incRating(-1);
+
         translation.updateNextLearnTimeByRating();
-
         translationMapper.updateTranslation(translation);
-        return notifier.success();
+
+        return isAnswerCorrect ? notifier.success() : Promise.reject();
       })
       .catch(() => notifier.message(`Wrong. Answer is ${ translation.getTranslate() }`));
   }

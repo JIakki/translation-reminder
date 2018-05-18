@@ -66,7 +66,10 @@ module.exports = class TranslationModel {
   }
 
   incRating(value) {
-    this.rating += value;
+    // do not descrease rating less than 0  
+    if(value > 0 || this.rating) {
+      this.rating += value;
+    }
   }
 
   updateNextLearnTimeByRating() {

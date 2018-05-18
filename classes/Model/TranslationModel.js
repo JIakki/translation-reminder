@@ -25,7 +25,7 @@ module.exports = class TranslationModel {
     this.translate = translate;
     this.traslationId = translationId;
     this.learned = learned;
-    this.learnAfterTime  = learnAfterTime;
+    this.learnAfterTime = learnAfterTime;
     this.rating = rating;
   }
 
@@ -75,7 +75,7 @@ module.exports = class TranslationModel {
   updateNextLearnTimeByRating() {
     const value = ratingMap[this.rating];
 
-    if(!value) {
+    if(value === undefined) {
       return this.setLearnStatus(true);
     }
 

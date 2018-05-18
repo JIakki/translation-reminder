@@ -8,8 +8,8 @@ module.exports = class TranslationMapper extends Mapper {
       .write()
   }
 
-  getTranslation(translation) {
-    return this.db.find({ word: translation.word }).value();
+  getTranslation(word) {
+    return this.db.find({ word }).value();
   }
 
   getRandomTranslation() {
